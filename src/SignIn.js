@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
-// import firebase from '../firebase'
+import firebase from '../firebase'
 
 // import HeaderBar from './HeaderBar'
 // import FooterBar from './FooterBar'
@@ -15,11 +15,13 @@ const instructions = Platform.select({
 
 
 export default class Home extends Component {
-
+  static navigationOptions = {
+    header: null,
+    };
   render() {
     return (
-    <Container>
-        <Content>
+    <Container style={{backgroundColor:'#ffca28'}}>
+        <Content style={{marginTop: '50%'}}>
           
 
 
@@ -41,3 +43,4 @@ export default class Home extends Component {
     );
   }
 }
+

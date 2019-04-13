@@ -7,7 +7,7 @@ import Schedule from './src/Schedule'
 import ChatBox from './src/Chat'
 import GetHelp from './src/GetHelp'
 import TripTable from './src/TripTable'
-// import SignIn from './src/SignIn'
+import SignIn from './src/SignIn'
 
 
 // import MainScreen from 
@@ -45,9 +45,9 @@ const TabNavigator = createBottomTabNavigator({
 
 
 const MainNavigator = createStackNavigator({
-  // SignIn: {
-  //   screen: SignIn,
-  // },
+  SignIn: {
+    screen: SignIn,
+  },
   TabNavigator: {
     screen: TabNavigator,
   },TripTable:{
