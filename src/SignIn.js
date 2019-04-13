@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
-import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
+import { Container, Button, Content, Form, Item, Input, Picker, Icon, Text } from 'native-base';
 import firebase from '../firebase'
 
 // import HeaderBar from './HeaderBar'
@@ -14,31 +14,59 @@ const instructions = Platform.select({
 });
 
 
-export default class Home extends Component {
+export default class SignIn extends Component {
   static navigationOptions = {
     header: null,
     };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      selected2: undefined
+    };
+  }
+  onValueChange2(value: string) {
+    this.setState({
+      selected2: value
+    });
+  }
   render() {
     return (
     <Container style={{backgroundColor:'#ffca28'}}>
-        <Content style={{marginTop: '50%'}}>
-          
+        <Content style={{marginTop: '60%'}}>
+          <Form>
+            <Item picker style={{borderColor: '#A9A9A9'}} >
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                style={{ width: undefined}}
+                placeholder="Who are you ?"
+                placeholderStyle={{ color: "#2F4F4F" }}
+                placeholderIconColor="#2F4F4F"
+                selectedValue={this.state.selected2}
+                onValueChange={this.onValueChange2.bind(this)}>
 
+                <Picker.Item label="Tourist" value="Users" />
+                <Picker.Item label="Guide" value="Guides" />
+              </Picker>
+            </Item>
 
-          <Card style={{marginTop: "5%"}}>
-            <CardItem>
-              <Left>
-                <Thumbnail source={{uri: 'https://dynaimage.cdn.cnn.com/cnn/q_auto,w_412,c_fill,g_auto,h_232,ar_16:9/http%3A%2F%2Fcdn.cnn.com%2Fcnnnext%2Fdam%2Fassets%2F170606121226-japan---travel-destination---shutterstock-230107657.jpg'}} />
-                <Body>
-                  <Text>Name Trip</Text>
-                  <Text note>Japan</Text>
-                  <Text note>3 Days</Text>
-                </Body>
-              </Left>
-            </CardItem>
-          </Card>
+            <Item last style={{borderColor: '#A9A9A9'}}>
+              <Input placeholder="Username" />
+            </Item>
+
+            <Item last style={{borderColor: '#A9A9A9'}}>
+              <Input placeholder="Password" />
+            </Item>
+            
+            <View style={{paddingTop: "20%", alignSelf: 'center', flexDirection:'row'}}>
+              <Button style={{marginRight:'5%'}} dark><Text> Sign Up </Text></Button>
+              <Button dark ><Text> Sign In </Text></Button>
+            </View>
+            
+
+          </Form>
         </Content>
-        {/* <FooterBar/> */}
     </Container>
     );
   }
