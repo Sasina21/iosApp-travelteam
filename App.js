@@ -2,15 +2,10 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import { createSwitchNavigator, createStackNavigator , createBottomTabNavigator, createAppContainer} from 'react-navigation';
 import { Icon } from 'native-base'
-import Home from './src/Home'
-import Schedule from './src/Schedule'
-import ChatBox from './src/Chat'
-import GetHelp from './src/GetHelp'
-import TripTable from './src/TripTable'
-import SignIn from './src/SignIn'
-import ForgotPassword from './src/ForgotPassword'
-import SignUp from './src/SignUp'
-
+import RootNavigation from './src/navigation/RootNavigation';
+import MainNavigation from './src/navigation/MainTabNavigation';
+import firebase from 'react-native-firebase'
+import ApiKeys from './ApiKeys'
 
 // import MainScreen from 
 
@@ -21,57 +16,33 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-const TabNavigator = createBottomTabNavigator({
-  MyTrips: {
-    screen: Home,
-    // headerTitle: "My Trips"
-  },
-  Schedule: {screen: Schedule},
-  ChatBox: {screen: ChatBox},
-  GetHelp: {screen: GetHelp}
-},{tabBarOptions:{
-  showLabel: false,
-  style: {
-    backgroundColor: '#ffca28',
-  },
-},
-  navigationOptions: ({ navigation }) => {
-    const { routeName } = navigation.state.routes
-    [navigation.state.index];
-    return{
-      headerTitle: routeName
+export default class App extends Component{
+  constructor(props) {
+    super(props);
+    this.state = {
+      isAuthenticationReady: false,
+      isAuthenticated: true,
     }
   }
-},
-);
 
-
-const MainNavigator = createStackNavigator({
-  SignIn: {
-    screen: SignIn,
-  },SignUp: {
-    screen: SignUp
-  },ForgotPassword: {
-    screen: ForgotPassword
-  },TabNavigator: {
-    screen: TabNavigator,
-  },TripTable:{
-    screen: TripTable,
-  },
-},{
-  defaultNavigationOptions: ({navigation}) => {
-    return {
-      headerRight: <Text>hi</Text>,
-      headerTintColor: '#2b2b2b',
-      headerStyle:{
-        backgroundColor: '#ffca28',
-      },
+  componentWillMount(){
+    if (!firebase.apps.length){
+      firebase.initializeApp(ApiKeys.FirebaseConfig)
     }
+    firebase.auth().onAuthStateChanged(this.onAuthStateChanged)
+  }
+
+  onAuthStateChanged = (user) => {
+    this.setState({isAuthenticationReady: true})
+    this.setState({isAuthenticated: !!user})
+  }
+  render(){
+    // if(!this.state.isAuthenticationReady)
+    console.log(this.state.isAuthenticated)
+    return(
+      <View style={{flex: 1}}>
+        { this.state.isAuthenticated ? <MainNavigation/>:<RootNavigation/>}
+      </View>
+    )
   }
 }
-);
-
-
-const App = createAppContainer(MainNavigator);
-
-export default App;

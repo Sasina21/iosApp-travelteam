@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
-import firebase from '../firebase'
+import firebase from 'react-native-firebase'
 
 // import HeaderBar from './HeaderBar'
 // import FooterBar from './FooterBar'
@@ -30,12 +30,16 @@ export default class Home extends Component {
                   })
     }
   
+    onSignOutPress = () => {
+      firebase.auth().signOut()
+    }
+
   render() {
     const {navigate} = this.props.navigation;
     return (
     <Container>
         <Content>
-        
+        <Button block style={{backgroundColor: '#281e5d'}} onPress={this.onSignOutPress} dark><Text> Sign Out </Text></Button>
         <Card>
             <CardItem button onPress={() => navigate('TripTable')}>
               <Left>

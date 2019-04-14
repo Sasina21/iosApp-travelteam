@@ -1,4 +1,4 @@
-import firebase from 'react-native-firebase';
+// import firebase from 'react-native-firebase';
 
 const config = {
     ClientId:'796798932873-f72vah52j9eur902i6ru22ur7l7d8ukn.apps.googleusercontent.com',
@@ -10,9 +10,9 @@ const config = {
     storageBucket: "project-190f0.appspot.com",
     messagingSenderId: "796798932873"
 };
-firebase.initializeApp(config);
+// firebase.initializeApp(config);
 
-export default firebase;
+// export default firebase;
 
 // export const database = firebase.database();
 // export const auth = firebase.auth();

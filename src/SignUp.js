@@ -38,7 +38,8 @@ export default class SignUp extends Component {
     firebase.auth().createUserWithEmailAndPassword(this.state.typedEmail, this.state.typedPassword)
     .then((signInUser) => {
       this.setState({ user: signInUser })
-      console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
+      Alert.alert("success")
+      // console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
     }).catch((error) => {
       console.log(`Register fail with error : ${error}`)
       Alert.alert(error.message)

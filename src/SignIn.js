@@ -24,7 +24,6 @@ export default class SignIn extends Component {
     this.unsubscriber = null;
     this.state = {
       selected1: undefined,
-      isAuthenticated: false,
       typedEmail: '',
       typedPassword: '',
       user: null,
@@ -36,34 +35,24 @@ export default class SignIn extends Component {
     });
   }
 
-  componentDidMount() {
-    this.unsubscriber = firebase.auth().onAuthStateChanged((changedUser) => {
-      this.setState({ user: changedUser })
-    })
-  }
+  // componentDidMount() {
+  //   this.unsubscriber = firebase.auth().onAuthStateChanged((changedUser) => {
+  //     this.setState({ user: changedUser })
+  //   })
+  // }
   
-  componentWillUnmount(){
-    if( this.unsubscriber ){
-      this.unsubscriber()
-    }
-  }
-
-  onRegister = () => {
-    firebase.auth().createUserWithEmailAndPassword(this.state.typedEmail, this.state.typedPassword)
-    .then((signInUser) => {
-      this.setState({ user: signInUser })
-      console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
-    }).catch((error) => {
-      console.log(`Register fail with error : ${error}`)
-      Alert.alert(error.message)
-    })
-  }
+  // componentWillUnmount(){
+  //   if( this.unsubscriber ){
+  //     this.unsubscriber()
+  //   }
+  // }
 
   onSignIn = () => {
     firebase.auth().signInWithEmailAndPassword(this.state.typedEmail, this.state.typedPassword)
     .then((signInUser) => {
       this.setState({user: signInUser})
-      console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
+      console.log(this.state.user)
+      // console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
     }).catch((error) => {
       console.log(`Register fail with error : ${error}`)
       Alert.alert(error.message)
@@ -74,8 +63,7 @@ export default class SignIn extends Component {
     return (
     <Container style={{backgroundColor:'#ffca28'}}>
         <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
-        <Image fontSize source={{uri: 'https://firebasestorage.googleapis.com/v0/b/project-190f0.appspot.com/o/Heartbeat-III.png?alt=media&token=a517cee4-b564-4713-bd18-d48970959183'}} 
-        style={{ alignSelf:'center' ,width: 120, height: 120}}/>
+        <Image style={{ alignSelf:'center' ,width: 120, height: 120}} source={require('./image/Heartbeat.png')} />
         <Text style={{paddingTop: "1%", alignSelf: 'center', fontWeight:'700', fontSize:20, color:'#2b2b2b'}}>TRAVEL  IS  LIFE</Text>
         <Text style={{paddingBottom: "5%", alignSelf: 'center',color:'#2b2b2b'}}>Let's create the life you love.</Text>
         
