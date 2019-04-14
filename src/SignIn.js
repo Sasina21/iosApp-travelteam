@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform, Image, View} from 'react-native';
+import {Platform, Image, View, Alert} from 'react-native';
 import { Container, Button, Content, Form, Item, Input, Picker, Icon, Text } from 'native-base';
 import firebase from 'react-native-firebase'
 
@@ -23,18 +23,16 @@ export default class SignIn extends Component {
     super(props);
     this.unsubscriber = null;
     this.state = {
-      selected2: undefined,
+      selected1: undefined,
       isAuthenticated: false,
       typedEmail: '',
       typedPassword: '',
       user: null,
-      showStatus: '',
-      errorStatus: '',
     };
   }
-  onValueChange2(value: string) {
+  onValueChange1(value: string) {
     this.setState({
-      selected2: value
+      selected1: value
     });
   }
 
@@ -57,15 +55,7 @@ export default class SignIn extends Component {
       console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
     }).catch((error) => {
       console.log(`Register fail with error : ${error}`)
-      this.setState({
-        errorStatus: `${error}`
-      })
-      const errorword = this.state.errorStatus.split(':')
-      if(errorword[0] == 'Error'){
-        this.setState({
-          showStatus: errorword[1]
-        })
-      }
+      Alert.alert(error.message)
     })
   }
 
@@ -76,16 +66,18 @@ export default class SignIn extends Component {
       console.log(`Register with user : ${JSON.stringify(signInUser.toJSON())}`)
     }).catch((error) => {
       console.log(`Register fail with error : ${error}`)
+      Alert.alert(error.message)
     })
   }
   render() {
+    const {navigate} = this.props.navigation;
     return (
     <Container style={{backgroundColor:'#ffca28'}}>
-        <Content style={{marginTop: '40%', flex: 1}}>
+        <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
         <Image fontSize source={{uri: 'https://firebasestorage.googleapis.com/v0/b/project-190f0.appspot.com/o/Heartbeat-III.png?alt=media&token=a517cee4-b564-4713-bd18-d48970959183'}} 
-        style={{ alignSelf:'center' ,width: 150, height: 150, flex: 1}}/>
-        <Text style={{paddingTop: "1%", alignSelf: 'center', fontWeight:'700', fontSize:20}}>TRAVEL  IS  LIFE</Text>
-        <Text style={{paddingBottom: "5%", alignSelf: 'center'}}>Let's create the life you love.</Text>
+        style={{ alignSelf:'center' ,width: 120, height: 120}}/>
+        <Text style={{paddingTop: "1%", alignSelf: 'center', fontWeight:'700', fontSize:20, color:'#2b2b2b'}}>TRAVEL  IS  LIFE</Text>
+        <Text style={{paddingBottom: "5%", alignSelf: 'center',color:'#2b2b2b'}}>Let's create the life you love.</Text>
         
           <Form>
             <Item picker style={{borderColor: '#A9A9A9'}} >
@@ -96,8 +88,8 @@ export default class SignIn extends Component {
                 placeholder="Who are you ?"
                 placeholderStyle={{ color: "#2F4F4F" }}
                 placeholderIconColor="#2F4F4F"
-                selectedValue={this.state.selected2}
-                onValueChange={this.onValueChange2.bind(this)}>
+                selectedValue={this.state.selected1}
+                onValueChange={this.onValueChange1.bind(this)}>
 
                 <Picker.Item label="Tourist" value="Users" />
                 <Picker.Item label="Guide" value="Guides" />
@@ -109,14 +101,15 @@ export default class SignIn extends Component {
             </Item>
 
             <Item last style={{borderColor: '#A9A9A9'}}>
-              <Input placeholder="Password" autoCorrect={false} autoCapitalize='none' secureTextEntry={true} onChangeText={(text) =>{this.setState({ typedPassword : text ,showStatus: ''})}} />
+              <Input placeholder="Password" autoCorrect={false} autoCapitalize='none' secureTextEntry={true} onChangeText={(text) =>{this.setState({ typedPassword : text})}} />
             </Item>
             
-            <Text style={{color: 'red', paddingTop:"4%", textAlign:'left', fontSize:13}} >{this.state.showStatus}</Text>
+            
 
             <View style={{margin:'3%'}}>
-              <Button block style={{marginBottom: '2%', backgroundColor: '#E1AD01'}} onPress={this.onSignIn} ><Text> Sign In </Text></Button>
-              <Button block style={{backgroundColor: '#281e5d'}}onPress={this.onRegister} dark><Text> Sign Up </Text></Button>
+              <Button block style={{marginBottom: '2%', backgroundColor: '#E1AD01'}} onPress={this.onSignIn} ><Text style={{color:'#2F4F4F'}}> Sign In </Text></Button>
+              <Button block style={{marginBottom: '2%', backgroundColor: '#281e5d'}} onPress={() => navigate('SignUp')} dark><Text> Sign Up </Text></Button>
+              <Text onPress={() => navigate('ForgotPassword')} style={{color: '#808080', textDecorationLine:'underline'}}>Forgot password ?</Text>
             </View>
             
             

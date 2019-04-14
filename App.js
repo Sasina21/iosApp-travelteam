@@ -8,6 +8,8 @@ import ChatBox from './src/Chat'
 import GetHelp from './src/GetHelp'
 import TripTable from './src/TripTable'
 import SignIn from './src/SignIn'
+import ForgotPassword from './src/ForgotPassword'
+import SignUp from './src/SignUp'
 
 
 // import MainScreen from 
@@ -47,8 +49,11 @@ const TabNavigator = createBottomTabNavigator({
 const MainNavigator = createStackNavigator({
   SignIn: {
     screen: SignIn,
-  },
-  TabNavigator: {
+  },SignUp: {
+    screen: SignUp
+  },ForgotPassword: {
+    screen: ForgotPassword
+  },TabNavigator: {
     screen: TabNavigator,
   },TripTable:{
     screen: TripTable,
@@ -57,7 +62,7 @@ const MainNavigator = createStackNavigator({
   defaultNavigationOptions: ({navigation}) => {
     return {
       headerRight: <Text>hi</Text>,
-      headerTintColor: 'black',
+      headerTintColor: '#2b2b2b',
       headerStyle:{
         backgroundColor: '#ffca28',
       },
