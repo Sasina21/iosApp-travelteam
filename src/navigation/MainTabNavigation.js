@@ -5,7 +5,7 @@ import { Icon } from 'native-base'
 import Home from '../Home'
 import Schedule from '../Schedule'
 import ChatBox from '../Chat'
-import GetHelp from '../GetHelp'
+import SignOut from '../SignOut'
 import TripTable from '../TripTable'
 
 
@@ -25,7 +25,7 @@ const TabNavigator = createBottomTabNavigator({
   },
   Schedule: {screen: Schedule},
   ChatBox: {screen: ChatBox},
-  GetHelp: {screen: GetHelp}
+  SignOut: {screen: SignOut}
 },{tabBarOptions:{
   showLabel: false,
   style: {

@@ -5,9 +5,11 @@ import firebase from 'react-native-firebase'
 
 export default class TabsScrollableExample extends Component {
   
-  static navigationOptions = {
-    headerTitle: 'ชื่อ',
-  }
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.getParam('nameTrip', 'Name Trip'),
+    };
+  };
 
   constructor(props) {
     super(props);

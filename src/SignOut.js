@@ -10,7 +10,7 @@ import firebase from 'react-native-firebase'
 export default class GetHelp extends Component {
   static navigationOptions = {
     tabBarIcon: ({focused}) => (
-      <Icon name="alert"  />
+      <Icon name="md-person"  />
     ),
     
     
