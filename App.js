@@ -22,6 +22,7 @@ export default class App extends Component{
     this.state = {
       isAuthenticationReady: false,
       isAuthenticated: true,
+      useruid: '',
     }
   }
 
@@ -33,12 +34,18 @@ export default class App extends Component{
   }
 
   onAuthStateChanged = (user) => {
-    this.setState({isAuthenticationReady: true})
-    this.setState({isAuthenticated: !!user})
+    this.setState({
+      isAuthenticationReady: true,
+      isAuthenticated: !!user,
+      // useruid: firebase.auth().currentUser.uid
+    })
+    // this.setState({isAuthenticated: !!user})
+
   }
   render(){
     // if(!this.state.isAuthenticationReady)
     console.log(this.state.isAuthenticated)
+    console.log(this.state.useruid)
     return(
       <View style={{flex: 1}}>
         { this.state.isAuthenticated ? <MainNavigation/>:<RootNavigation/>}

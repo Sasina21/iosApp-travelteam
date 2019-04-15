@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
 import firebase from 'react-native-firebase'
+import { objectTypeAnnotation } from '@babel/types';
 
 // import HeaderBar from './HeaderBar'
 // import FooterBar from './FooterBar'
@@ -15,6 +16,16 @@ const instructions = Platform.select({
 
 
 export default class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataTrip: null,
+      oldDataTrip: null,
+    };
+    this.componentWillMount = this.componentWillMount.bind(this)
+    // this.readData = this.readData.bind(this)
+  }
+
   static navigationOptions = {
       tabBarIcon: ({focused}) => (
        <Icon name="home" color={focused ? 'white' : 'black'} />
@@ -22,54 +33,122 @@ export default class Home extends Component {
       
     }
 
-    componentDidMount() {
-      var id_company= firebase.database().ref("Guides/")
-            id_company.once("value")
-                  .then(snapshot => {
-                    console.log(snapshot.val())
-                  })
+    componentWillMount() {
+      this.readOldData()
+      this.readActiveData()
     }
   
     onSignOutPress = () => {
       firebase.auth().signOut()
     }
 
+    async readActiveData(){
+      var arr = []
+      var dbUser= await firebase.database().ref("Users/gDC8AzurOyPb85dJ4xxXj3jd7d13/" )
+            await dbUser.child('activeTrip').once("value")
+              .then(snapshot => {
+                if(snapshot.val() !== null){
+                  console.log(snapshot.val().idGroup)
+                  var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                    dbGroup.once("value")
+                      .then(snapshot => {
+                      this.setState({
+                        dataTrip: snapshot.val()
+                      })
+                      console.log(this.state.dataTrip)
+                      })
+                }
+              })
+              // await dbUser.child('oldTrip').once("value")
+              // .then(snapshot => {
+              //   if(snapshot.val() !== null){
+              //     console.log(Object.values(snapshot.val()))
+              //     Object.values(snapshot.val()).map((item,index) => {
+              //       console.log(item.idGroup)
+              //       var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+              //         dbGroup.once("value")
+              //           .then(snapshot => {
+              //             arr.push(snapshot.val())
+              //           })
+              //     })
+              //     this.setState({
+              //       oldDataTrip: arr
+              //     })
+              //     console.log(this.state.oldDataTrip)
+              //   }
+              // })
+  }
+
+  async readOldData(){
+    var arr = []
+    var dbUser= firebase.database().ref("Users/gDC8AzurOyPb85dJ4xxXj3jd7d13/" )
+    dbUser.child('oldTrip').once("value")
+              .then(snapshot => {
+                if(snapshot.val() !== null){
+                  console.log(Object.values(snapshot.val()))
+                  Object.values(snapshot.val()).map((item,index) => {
+                    console.log(item.idGroup)
+                    var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+                      dbGroup.once("value")
+                        .then(snapshot => {
+                          arr.push(snapshot.val())
+                        })
+                  })
+                  this.setState({
+                    oldDataTrip: arr
+                  })
+                  console.log(this.state.oldDataTrip)
+                }
+              })
+}
+  
+
   render() {
     const {navigate} = this.props.navigation;
+    console.log(this.props.useruid)
     return (
-    <Container>
+      <Container>
         <Content>
         <Button block style={{backgroundColor: '#281e5d'}} onPress={this.onSignOutPress} dark><Text> Sign Out </Text></Button>
-        <Card>
-            <CardItem button onPress={() => navigate('TripTable')}>
-              <Left>
-                <Thumbnail source={{uri: 'https://dynaimage.cdn.cnn.com/cnn/q_auto,w_412,c_fill,g_auto,h_232,ar_16:9/http%3A%2F%2Fcdn.cnn.com%2Fcnnnext%2Fdam%2Fassets%2F170606121226-japan---travel-destination---shutterstock-230107657.jpg'}} />
-                <Body>
-                  <Text>Name Trip</Text>
-                  <Text note>Japan</Text>
-                  <Text note>3 Days</Text>
-                </Body>
-              </Left>
-            </CardItem>
-          </Card>
-          
-
-
-          <Card style={{marginTop: "5%"}}>
-            <CardItem>
-              <Left>
-                <Thumbnail source={{uri: 'https://dynaimage.cdn.cnn.com/cnn/q_auto,w_412,c_fill,g_auto,h_232,ar_16:9/http%3A%2F%2Fcdn.cnn.com%2Fcnnnext%2Fdam%2Fassets%2F170606121226-japan---travel-destination---shutterstock-230107657.jpg'}} />
-                <Body>
-                  <Text>Name Trip</Text>
-                  <Text note>Japan</Text>
-                  <Text note>3 Days</Text>
-                </Body>
-              </Left>
-            </CardItem>
-          </Card>
+        
+            { 
+              this.state.dataTrip && 
+              (<Card>
+                <CardItem button onPress={() => navigate('TripTable')}>
+                  <Left>
+                    <Thumbnail source={{uri: this.state.dataTrip.firstpic}} />
+                    <Body>
+                      <Text>{this.state.dataTrip.nameTrip}</Text>
+                      <Text note>{this.state.dataTrip.country}</Text>
+                      <Text note>{this.state.dataTrip.duration} Days</Text>
+                    </Body>
+                  </Left>
+                </CardItem>
+              </Card>)
+                
+            }
+          <View style={{marginTop:'7%'}}>
+            {
+              this.state.oldDataTrip && this.state.oldDataTrip.map((item, index) => {
+                return(
+                  <Card key={index}>
+                    <CardItem button onPress={() => navigate('TripTable')}>
+                      <Left>
+                        <Thumbnail source={{uri: item.firstpic}} />
+                        <Body>
+                          <Text>{item.nameTrip}</Text>
+                          <Text note>{item.country}</Text>
+                          <Text note>{item.duration} Days</Text>
+                        </Body>
+                      </Left>
+                    </CardItem>
+                  </Card>
+                )
+              })
+            }
+          </View>
         </Content>
-        {/* <FooterBar/> */}
-    </Container>
+      </Container>
     );
   }
 }
