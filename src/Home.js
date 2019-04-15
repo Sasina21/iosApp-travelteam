@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
 import firebase from 'react-native-firebase'
-import { objectTypeAnnotation } from '@babel/types';
 
 // import HeaderBar from './HeaderBar'
 // import FooterBar from './FooterBar'
@@ -37,6 +36,9 @@ export default class Home extends Component {
       this.readOldData()
       this.readActiveData()
     }
+    // componentDidMount() {
+    //   this.readActiveData()
+    // }
   
     onSignOutPress = () => {
       firebase.auth().signOut()
@@ -44,9 +46,10 @@ export default class Home extends Component {
 
     async readActiveData(){
       var arr = []
-      var dbUser= await firebase.database().ref("Users/gDC8AzurOyPb85dJ4xxXj3jd7d13/" )
+      var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid )
             await dbUser.child('activeTrip').once("value")
               .then(snapshot => {
+                console.log(snapshot.val())
                 if(snapshot.val() !== null){
                   console.log(snapshot.val().idGroup)
                   var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
@@ -81,7 +84,7 @@ export default class Home extends Component {
 
   async readOldData(){
     var arr = []
-    var dbUser= firebase.database().ref("Users/gDC8AzurOyPb85dJ4xxXj3jd7d13/" )
+    var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid )
     dbUser.child('oldTrip').once("value")
               .then(snapshot => {
                 if(snapshot.val() !== null){
@@ -105,18 +108,22 @@ export default class Home extends Component {
 
   render() {
     const {navigate} = this.props.navigation;
-    console.log(this.props.useruid)
+    // console.log(firebase.auth().currentUser.uid)
     return (
       <Container>
-        <Content>
-        <Button block style={{backgroundColor: '#281e5d'}} onPress={this.onSignOutPress} dark><Text> Sign Out </Text></Button>
+        <Content contentContainerStyle={{ flex: 1 }}>
+        {/* <Button block style={{backgroundColor: '#281e5d'}} onPress={this.onSignOutPress} dark><Text> Sign Out </Text></Button> */}
         
             { 
               this.state.dataTrip && 
               (<Card>
-                <CardItem button onPress={() => navigate('TripTable')}>
+                <CardItem button onPress={() => navigate('TripTable', 
+                                                {idGroup : this.state.dataTrip.idGroup, 
+                                                nameTrip: this.state.dataTrip.nameTrip,
+                                                duration : this.state.dataTrip.duration
+                                                })}>
                   <Left>
-                    <Thumbnail source={{uri: this.state.dataTrip.firstpic}} />
+                    <Thumbnail source={{uri: this.state.dataTrip.picfirst}} />
                     <Body>
                       <Text>{this.state.dataTrip.nameTrip}</Text>
                       <Text note>{this.state.dataTrip.country}</Text>
@@ -132,7 +139,11 @@ export default class Home extends Component {
               this.state.oldDataTrip && this.state.oldDataTrip.map((item, index) => {
                 return(
                   <Card key={index}>
-                    <CardItem button onPress={() => navigate('TripTable')}>
+                    <CardItem button onPress={() => navigate('TripTable', 
+                                                {idGroup : item.idGroup, 
+                                                nameTrip: item.nameTrip,
+                                                duration : item.duration
+                                                })}>
                       <Left>
                         <Thumbnail source={{uri: item.firstpic}} />
                         <Body>

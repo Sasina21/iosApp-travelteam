@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Platform, Image, View, Alert} from 'react-native';
-import { Container, Button, Content, Form, Item, Input, Picker, Icon, Text } from 'native-base';
+import { Container, Button, Content, Form, Item, Input, Text } from 'native-base';
 import firebase from 'react-native-firebase'
 
 // import HeaderBar from './HeaderBar'

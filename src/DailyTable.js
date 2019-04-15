@@ -4,12 +4,13 @@ import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Ic
 
 
 export default class DailyTable extends Component {
+  
   render() {
     return (
       <Container>
         <Content>
 
-          <Card style={{flex: 0}}>
+          <Card style={{flex: 1}}>
             <CardItem>
               <Left>
                 <Body>
@@ -21,7 +22,7 @@ export default class DailyTable extends Component {
             <CardItem>
               <Body>
                 <Image source={{uri: 'https://dynaimage.cdn.cnn.com/cnn/q_auto,w_412,c_fill,g_auto,h_232,ar_16:9/http%3A%2F%2Fcdn.cnn.com%2Fcnnnext%2Fdam%2Fassets%2F170606121226-japan---travel-destination---shutterstock-230107657.jpgL'}} 
-                style={{height: 200, width: 340, flex: 1}}/>
+                style={{height: 200, width: 350, flex: 1,alignSelf: 'center'}}/>
                 <Text>
                   ปราสาทที่งดงามมากๆ แห่งหนึ่ง มีตำนานเล่าขาน
                 </Text>

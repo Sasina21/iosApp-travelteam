@@ -63,13 +63,13 @@ export default class SignIn extends Component {
     return (
     <Container style={{backgroundColor:'#ffca28'}}>
         <Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
-        <Image style={{ alignSelf:'center' ,width: 120, height: 120}} source={require('./image/Heartbeat.png')} />
-        <Text style={{paddingTop: "1%", alignSelf: 'center', fontWeight:'700', fontSize:20, color:'#2b2b2b'}}>TRAVEL  IS  LIFE</Text>
-        <Text style={{paddingBottom: "5%", alignSelf: 'center',color:'#2b2b2b'}}>Let's create the life you love.</Text>
-        
+          <Icon style={{ alignSelf:'center' ,fontSize: 100}} name="md-pulse" />
+          <Text style={{paddingTop: "1%", alignSelf: 'center', fontWeight:'700', fontSize:20, color:'#2b2b2b'}}>TRAVEL  IS  LIFE</Text>
+          <Text style={{paddingBottom: "5%", alignSelf: 'center',color:'#2b2b2b'}}>Let's create the life you love.</Text>
+          
           <Form>
             <Item picker style={{borderColor: '#A9A9A9'}} >
-              <Picker
+              <Picker id='typeUser'
                 mode="dropdown"
                 iosIcon={<Icon name="arrow-down" />}
                 style={{ width: undefined}}
