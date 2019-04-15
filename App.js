@@ -44,8 +44,8 @@ export default class App extends Component{
   }
   render(){
     // if(!this.state.isAuthenticationReady)
-    // console.log(this.state.isAuthenticated)
-    // console.log(this.state.useruid)
+    console.log(this.state.isAuthenticated)
+    console.log(this.state.useruid)
     return(
       <View style={{flex: 1}}>
         { this.state.isAuthenticated ? <MainNavigation/>:<RootNavigation/>}

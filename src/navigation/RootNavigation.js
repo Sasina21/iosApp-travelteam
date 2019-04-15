@@ -21,29 +21,29 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-const TabNavigator = createBottomTabNavigator({
-  MyTrips: {
-    screen: Home,
-    // headerTitle: "My Trips"
-  },
-  Schedule: {screen: Schedule},
-  ChatBox: {screen: ChatBox},
-  SignOut: {screen: SignOut}
-},{tabBarOptions:{
-  showLabel: false,
-  style: {
-    backgroundColor: '#ffca28',
-  },
-},
-  navigationOptions: ({ navigation }) => {
-    const { routeName } = navigation.state.routes
-    [navigation.state.index];
-    return{
-      headerTitle: routeName
-    }
-  }
-},
-);
+// const TabNavigator = createBottomTabNavigator({
+//   MyTrips: {
+//     screen: Home,
+//     // headerTitle: "My Trips"
+//   },
+//   Schedule: {screen: Schedule},
+//   ChatBox: {screen: ChatBox},
+//   SignOut: {screen: SignOut}
+// },{tabBarOptions:{
+//   showLabel: false,
+//   style: {
+//     backgroundColor: '#ffca28',
+//   },
+// },
+//   navigationOptions: ({ navigation }) => {
+//     const { routeName } = navigation.state.routes
+//     [navigation.state.index];
+//     return{
+//       headerTitle: routeName
+//     }
+//   }
+// },
+// );
 
 
 const MainNavigator = createStackNavigator({
@@ -53,10 +53,6 @@ const MainNavigator = createStackNavigator({
     screen: SignUp
   },ForgotPassword: {
     screen: ForgotPassword
-  },TabNavigator: {
-    screen: TabNavigator,
-  },TripTable:{
-    screen: TripTable,
   },
 },{
   defaultNavigationOptions: ({navigation}) => {

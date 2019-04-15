@@ -21,8 +21,8 @@ export default class Home extends Component {
       dataTrip: null,
       oldDataTrip: null,
     };
-    this.componentWillMount = this.componentWillMount.bind(this)
-    // this.readData = this.readData.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
+    this.insertUser()
   }
 
   static navigationOptions = {
@@ -32,7 +32,7 @@ export default class Home extends Component {
       
     }
 
-    componentWillMount() {
+    componentDidMount() {
       this.readOldData()
       this.readActiveData()
     }
@@ -103,6 +103,14 @@ export default class Home extends Component {
                   console.log(this.state.oldDataTrip)
                 }
               })
+``}
+async insertUser(){
+  // console.log('hi')
+  let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
+  dbUser.update({
+    useruid: firebase.auth().currentUser.uid,
+    email: firebase.auth().currentUser.email,
+  })
 }
   
 
@@ -113,7 +121,6 @@ export default class Home extends Component {
       <Container>
         <Content contentContainerStyle={{ flex: 1 }}>
         {/* <Button block style={{backgroundColor: '#281e5d'}} onPress={this.onSignOutPress} dark><Text> Sign Out </Text></Button> */}
-        
             { 
               this.state.dataTrip && 
               (<Card>
@@ -145,7 +152,7 @@ export default class Home extends Component {
                                                 duration : item.duration
                                                 })}>
                       <Left>
-                        <Thumbnail source={{uri: item.firstpic}} />
+                        <Thumbnail source={{uri: item.picfirst}} />
                         <Body>
                           <Text>{item.nameTrip}</Text>
                           <Text note>{item.country}</Text>
