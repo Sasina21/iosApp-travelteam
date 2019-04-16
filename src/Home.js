@@ -148,9 +148,8 @@ async insertUser(){
           }
 
           <View style={{marginTop:'7%' ,flex: 1}}>
-          <Text style={{fontSize:13}}> Old Trips </Text>
             {
-              this.state.oldDataTrip && this.state.oldDataTrip.map((item, index) => {
+              this.state.oldDataTrip && <Text style={{fontSize:13}}> Old Trips </Text> && this.state.oldDataTrip.map((item, index) => {
                 return(
                   <Card key={index}>
                     <CardItem button onPress={() => navigate('TripTable', 

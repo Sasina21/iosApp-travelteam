@@ -68,7 +68,7 @@ export default class SignIn extends Component {
           <Text style={{paddingBottom: "5%", alignSelf: 'center',color:'#2b2b2b'}}>Let's create the life you love.</Text>
           
           <Form>
-            <Item picker style={{borderColor: '#A9A9A9'}} >
+            {/* <Item picker style={{borderColor: '#A9A9A9'}} >
               <Picker id='typeUser'
                 mode="dropdown"
                 iosIcon={<Icon name="arrow-down" />}
@@ -82,7 +82,7 @@ export default class SignIn extends Component {
                 <Picker.Item label="Tourist" value="Users" />
                 <Picker.Item label="Guide" value="Guides" />
               </Picker>
-            </Item>
+            </Item> */}
 
             <Item last style={{borderColor: '#A9A9A9'}}>
               <Input placeholder="E-mail" autoCorrect={false} autoCapitalize='none' onChangeText={(text) =>{this.setState({ typedEmail : text })}} />
