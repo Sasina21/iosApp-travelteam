@@ -57,7 +57,7 @@ const MainNavigator = createStackNavigator({
 },{
   defaultNavigationOptions: ({navigation}) => {
     return {
-      headerRight: <Text>hi</Text>,
+      // headerRight: <Text>hi</Text>,
       headerTintColor: '#2b2b2b',
       headerStyle:{
         backgroundColor: '#ffca28',

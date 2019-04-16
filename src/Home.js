@@ -49,73 +49,85 @@ export default class Home extends Component {
 
     async readActiveData(){
       var arr = []
-      var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
-            await dbUser.once("value")
-              .then(snapshot => {
-                console.log(snapshot.val())
-                if(snapshot.val() !== null){
-                  console.log(snapshot.val().idGroup)
-                  var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
-                    dbGroup.once("value")
-                      .then(snapshot => {
-                      this.setState({
-                        dataTrip: snapshot.val()
-                      })
-                      console.log(this.state.dataTrip)
-                      })
-                }
-              })
+      if(firebase.auth().currentUser != null){
+
+        var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
+              await dbUser.once("value")
+                .then(snapshot => {
+                  console.log(snapshot.val())
+                  if(snapshot.val() !== null){
+                    console.log(snapshot.val().idGroup)
+                    var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                      dbGroup.once("value")
+                        .then(snapshot => {
+                        this.setState({
+                          dataTrip: snapshot.val()
+                        })
+                        console.log(this.state.dataTrip)
+                        })
+                  }
+                })
+      }
   }
 
   async readOldData(){
     var arr = []
-    var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
-      dbUser.once("value")
-              .then(snapshot => {
-                if(snapshot.val() !== null){
-                  console.log(Object.values(snapshot.val()))
-                  Object.values(snapshot.val()).map((item,index) => {
-                    console.log(item.idGroup)
-                    var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
-                      dbGroup.once("value")
-                        .then(snapshot => {
-                          arr.push(snapshot.val())
-                        })
-                  })
-                  this.setState({
-                    oldDataTrip: arr
-                  })
-                  console.log(this.state.oldDataTrip)
-                }
-              })
+    if(firebase.auth().currentUser != null){
+
+      var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
+        dbUser.once("value")
+                .then(snapshot => {
+                  if(snapshot.val() !== null){
+                    console.log(Object.values(snapshot.val()))
+                    Object.values(snapshot.val()).map((item,index) => {
+                      console.log(item.idGroup)
+                      var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+                        dbGroup.once("value")
+                          .then(snapshot => {
+                            arr.push(snapshot.val())
+                          })
+                    })
+                    this.setState({
+                      oldDataTrip: arr
+                    })
+                    console.log(this.state.oldDataTrip)
+                  }
+                })
+    }
 }
 
 areyouGuide(){
-  let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
-  dbGuide.once("value")
-    .then(snapshot => {
-      if(snapshot.val() !== null){
-        this.setState({
-          checkGuide: true,
-        })
-      }
-    })
-    console.log(this.state.checkGuide)
+  if(firebase.auth().currentUser != null){
+
+    let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
+    dbGuide.once("value")
+      .then(snapshot => {
+        if(snapshot.val() !== null){
+          this.setState({
+            checkGuide: true,
+          })
+        }
+      })
+      console.log(this.state.checkGuide)
+  }
 }
 
 async insertUser(){
   // console.log('hi')
-  if(!this.state.checkGuide){
-    console.log('Im user')
-    let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
-    dbUser.update({
-      useruid: firebase.auth().currentUser.uid,
-      email: firebase.auth().currentUser.email,
-    })
-  
-    dbUser.child('/activeTrip').update({
-      id: 'id'
-    })
+  if(firebase.auth().currentUser != null){
+
+    if(!this.state.checkGuide){
+      console.log('Im user')
+      let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
+      dbUser.update({
+        useruid: firebase.auth().currentUser.uid,
+        email: firebase.auth().currentUser.email,
+      })
+    
+      dbUser.child('/activeTrip').update({
+        id: 'id'
+      })
+    }
   }
 }
   
