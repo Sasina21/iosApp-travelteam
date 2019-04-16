@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image } from 'react-native';
+import { Image, ScrollView } from 'react-native';
 import { Container, Content, Tab, Tabs, ScrollableTab, Text, Card, CardItem, Left, Body } from 'native-base';
 import firebase from 'react-native-firebase'
 
@@ -76,7 +76,8 @@ export default class TabsScrollableExample extends Component {
                 
                 return(
                   <Tab key={day} heading = {'Day '+ day } >
-                  {
+                  <ScrollView style={{ flex: 1 }}>
+                    {
                     
                     this.state.dataTrip && this.state.dataTrip.map((item, index) => {
                       if(day == item.bookDay){
@@ -104,20 +105,14 @@ export default class TabsScrollableExample extends Component {
                         )
                       }
                     })
-                  }                  
-                  </Tab>
-                )
-              })
-            }
-            
-            {/* {
-              this.state.dataTrip && this.state.dataTrip.map((item, index) => {
-                console.log(item.bookDay)
-              })
-            } */}
-
-            </Tabs>
-            </Content>
+                  }  
+                </ScrollView>                
+              </Tab>
+              )
+            })
+          }
+          </Tabs>
+        </Content>
       </Container>
     );
   }

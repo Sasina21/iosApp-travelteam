@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
+import {Platform, ScrollView, View} from 'react-native';
 import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
 import firebase from 'react-native-firebase'
 
@@ -52,12 +52,14 @@ export default class Home extends Component {
       if(firebase.auth().currentUser != null){
 
         var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
+        dbUser.keepSynced(true)
               await dbUser.once("value")
                 .then(snapshot => {
                   console.log(snapshot.val())
                   if(snapshot.val() !== null){
                     console.log(snapshot.val().idGroup)
                     var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                    dbGroup.keepSynced(true)
                       dbGroup.once("value")
                         .then(snapshot => {
                         this.setState({
@@ -75,6 +77,7 @@ export default class Home extends Component {
     if(firebase.auth().currentUser != null){
 
       var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
+      dbUser.keepSynced(true)
         dbUser.once("value")
                 .then(snapshot => {
                   if(snapshot.val() !== null){
@@ -82,6 +85,7 @@ export default class Home extends Component {
                     Object.values(snapshot.val()).map((item,index) => {
                       console.log(item.idGroup)
                       var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+                      dbGroup.keepSynced(true)
                         dbGroup.once("value")
                           .then(snapshot => {
                             arr.push(snapshot.val())
@@ -100,6 +104,7 @@ areyouGuide(){
   if(firebase.auth().currentUser != null){
 
     let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
+    dbGuide.keepSynced(true)
     dbGuide.once("value")
       .then(snapshot => {
         if(snapshot.val() !== null){
@@ -119,6 +124,7 @@ async insertUser(){
     if(!this.state.checkGuide){
       console.log('Im user')
       let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
+      dbUser.keepSynced(true)
       dbUser.update({
         useruid: firebase.auth().currentUser.uid,
         email: firebase.auth().currentUser.email,
@@ -137,7 +143,7 @@ async insertUser(){
     // console.log(firebase.auth().currentUser.uid)
     return (
       <Container>
-        <Content contentContainerStyle={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1 }}>
           { 
               this.state.dataTrip && 
               (<Card>
@@ -160,30 +166,33 @@ async insertUser(){
           }
 
           <View style={{marginTop:'7%' ,flex: 1}}>
-            {
-              this.state.oldDataTrip && <Text style={{fontSize:13}}> Old Trips </Text> && this.state.oldDataTrip.map((item, index) => {
-                return(
-                  <Card key={index}>
-                    <CardItem button onPress={() => navigate('TripTable', 
-                                                {idGroup : item.idGroup, 
-                                                nameTrip: item.nameTrip,
-                                                duration : item.duration
-                                                })}>
-                      <Left>
-                        <Thumbnail source={{uri: item.picfirst}} />
-                        <Body>
-                          <Text>{item.nameTrip}</Text>
-                          <Text note>{item.country}</Text>
-                          <Text note>{item.duration} Days</Text>
-                        </Body>
-                      </Left>
-                    </CardItem>
-                  </Card>
-                )
-              })
-            }
+          {
+            this.state.dataTrip && <Text style={{fontSize:13}}>Old Trips</Text>
+          }
+          {
+            this.state.oldDataTrip && this.state.oldDataTrip.map((item, index) => {
+              return(
+                <Card key={index}>
+                  <CardItem button onPress={() => navigate('TripTable', 
+                                              {idGroup : item.idGroup, 
+                                              nameTrip: item.nameTrip,
+                                              duration : item.duration
+                                              })}>
+                    <Left>
+                      <Thumbnail source={{uri: item.picfirst}} />
+                      <Body>
+                        <Text>{item.nameTrip}</Text>
+                        <Text note>{item.country}</Text>
+                        <Text note>{item.duration} Days</Text>
+                      </Body>
+                    </Left>
+                  </CardItem>
+                </Card>
+              )
+            })
+          }
           </View> 
-        </Content>
+        </ScrollView>
       </Container>
     );
   }

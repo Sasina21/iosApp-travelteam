@@ -34,6 +34,7 @@ export default class Schedule extends Component {
   readData(){
     let useruid = firebase.auth().currentUser.uid
     let dbUser = firebase.database().ref("Users/" + useruid + '/activeTrip/idGroup')
+    dbUser.keepSynced(true)
     dbUser.once("value")
       .then(snapshot => {
         this.setState({
@@ -41,6 +42,7 @@ export default class Schedule extends Component {
         })
         console.log(this.state.idGroup)
         let dbGroup = firebase.database().ref("Groups/" + this.state.idGroup)
+        dbGroup.keepSynced(true)
         dbGroup.once("value")
           .then(snapshot => {
             this.setState({
@@ -85,15 +87,15 @@ export default class Schedule extends Component {
         <Tabs renderTabBar={()=> <ScrollableTab />}>
             {
               this.buidDuration().map(day => {
-                
                 return(
                   <Tab key={day} heading = {'Day '+ day } >
+                  <ScrollView style={{ flex: 1 }}>
                   {
-                    
                     this.state.dataTrip && this.state.dataTrip.map((item, index) => {
                       if(day == item.bookDay){
                         console.log(item.bookDay, day)
                         return (
+                          
                           <View key={index} style={{margin: '4%'}}>
                             <Text style={{fontSize: 21}}>{item.location}</Text>
                             <Text style={styles.text}>Start time : {item.startTime}</Text>
@@ -103,46 +105,22 @@ export default class Schedule extends Component {
                         )
                       }
                     })
-
-                  }                  
-                  </Tab>
-                )
-              })
-            }
-            </Tabs>
-        
-    
-        {/* <Content style={{flex:1 ,marginLeft: "5%", marginTop : "5%"}}>
-          <Text style={{fontSize: 21}}>Harajuku</Text>
-          
-          <Text style={styles.text}>Start time : 12:00</Text>
-          <Text style={styles.text}>End time : 13:00</Text>
-          <View style={{ borderBottomColor: 'black',borderBottomWidth: 1, paddingTop: '5%'}}/>
-          
-          <Text style={styles.location}>Harajuku</Text>
-          <Text style={styles.text}>Start time : 12:00 </Text>
-          <Text style={styles.text}>End time : 13:00 </Text>
-        </Content> */}
-        </Content>
-      </Container>
+                  }  
+                  </ScrollView>                
+                </Tab>
+              )
+            })
+          }
+        </Tabs>
+      </Content>
+    </Container>
     );
   }
-  
 }
 const styles = StyleSheet.create({
-  location: {
-    color: "black",
-    fontSize: 21,
-    marginTop: 20,
-  },
   text:{
     color: "black",
     fontSize: 18,
     marginTop: 9,
-  },
-  icon: {
-    color: "black",
-    // fontSize: 80,
-    
-  },
+  }
 });
