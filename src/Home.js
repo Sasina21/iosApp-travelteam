@@ -20,9 +20,12 @@ export default class Home extends Component {
     this.state = {
       dataTrip: null,
       oldDataTrip: null,
+      checkGuide: false,
     };
-    this.componentDidMount = this.componentDidMount.bind(this)
+    this.areyouGuide()
+    this.componentWillMount = this.componentWillMount.bind(this)
     this.insertUser()
+    this.readOldData()
   }
 
   static navigationOptions = {
@@ -32,13 +35,13 @@ export default class Home extends Component {
       
     }
 
-    componentDidMount() {
+    componentWillMount() {
       this.readOldData()
+      // this.readActiveData()
+    }
+    componentDidMount() {
       this.readActiveData()
     }
-    // componentDidMount() {
-    //   this.readActiveData()
-    // }
   
     onSignOutPress = () => {
       firebase.auth().signOut()
@@ -46,8 +49,8 @@ export default class Home extends Component {
 
     async readActiveData(){
       var arr = []
-      var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid )
-            await dbUser.child('activeTrip').once("value")
+      var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
+            await dbUser.once("value")
               .then(snapshot => {
                 console.log(snapshot.val())
                 if(snapshot.val() !== null){
@@ -62,30 +65,12 @@ export default class Home extends Component {
                       })
                 }
               })
-              // await dbUser.child('oldTrip').once("value")
-              // .then(snapshot => {
-              //   if(snapshot.val() !== null){
-              //     console.log(Object.values(snapshot.val()))
-              //     Object.values(snapshot.val()).map((item,index) => {
-              //       console.log(item.idGroup)
-              //       var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
-              //         dbGroup.once("value")
-              //           .then(snapshot => {
-              //             arr.push(snapshot.val())
-              //           })
-              //     })
-              //     this.setState({
-              //       oldDataTrip: arr
-              //     })
-              //     console.log(this.state.oldDataTrip)
-              //   }
-              // })
   }
 
   async readOldData(){
     var arr = []
-    var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid )
-    dbUser.child('oldTrip').once("value")
+    var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
+      dbUser.once("value")
               .then(snapshot => {
                 if(snapshot.val() !== null){
                   console.log(Object.values(snapshot.val()))
@@ -103,14 +88,35 @@ export default class Home extends Component {
                   console.log(this.state.oldDataTrip)
                 }
               })
-``}
+}
+
+areyouGuide(){
+  let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
+  dbGuide.once("value")
+    .then(snapshot => {
+      if(snapshot.val() !== null){
+        this.setState({
+          checkGuide: true,
+        })
+      }
+    })
+    console.log(this.state.checkGuide)
+}
+
 async insertUser(){
   // console.log('hi')
-  let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
-  dbUser.update({
-    useruid: firebase.auth().currentUser.uid,
-    email: firebase.auth().currentUser.email,
-  })
+  if(!this.state.checkGuide){
+    console.log('Im user')
+    let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
+    dbUser.update({
+      useruid: firebase.auth().currentUser.uid,
+      email: firebase.auth().currentUser.email,
+    })
+  
+    dbUser.child('/activeTrip').update({
+      id: 'id'
+    })
+  }
 }
   
 
@@ -120,8 +126,7 @@ async insertUser(){
     return (
       <Container>
         <Content contentContainerStyle={{ flex: 1 }}>
-        {/* <Button block style={{backgroundColor: '#281e5d'}} onPress={this.onSignOutPress} dark><Text> Sign Out </Text></Button> */}
-            { 
+          { 
               this.state.dataTrip && 
               (<Card>
                 <CardItem button onPress={() => navigate('TripTable', 
@@ -140,8 +145,10 @@ async insertUser(){
                 </CardItem>
               </Card>)
                 
-            }
-          <View style={{marginTop:'7%'}}>
+          }
+
+          <View style={{marginTop:'7%' ,flex: 1}}>
+          <Text style={{fontSize:13}}> Old Trips </Text>
             {
               this.state.oldDataTrip && this.state.oldDataTrip.map((item, index) => {
                 return(
@@ -164,7 +171,7 @@ async insertUser(){
                 )
               })
             }
-          </View>
+          </View> 
         </Content>
       </Container>
     );

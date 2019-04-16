@@ -28,18 +28,18 @@ export default class Schedule extends Component {
   componentWillMount(){
     this.readData()
     this.buidDuration()
-    this.buildOptionsTime()
+    // this.buildOptionsTime()
   }
 
   readData(){
     let useruid = firebase.auth().currentUser.uid
-    let dbUser = firebase.database().ref("Users/" + useruid + '/activeTrip')
+    let dbUser = firebase.database().ref("Users/" + useruid + '/activeTrip/idGroup')
     dbUser.once("value")
       .then(snapshot => {
         this.setState({
-          idGroup: Object.values(snapshot.val())
+          idGroup: snapshot.val()
         })
-        // console.log(this.state.idGroup)
+        console.log(this.state.idGroup)
         let dbGroup = firebase.database().ref("Groups/" + this.state.idGroup)
         dbGroup.once("value")
           .then(snapshot => {
@@ -75,16 +75,13 @@ export default class Schedule extends Component {
         arr.push(i+':30 ')
     }
     arr.push('0:00')
-    console.log(arr)
+    // console.log(arr)
     return arr
 }
   render(){
     return(
       <Container>
       <Content contentContainerStyle={{ flex: 1 }}>
-      {
-        !this.state.dataTrip && (<Text style={{fontSize: 21}}>No active trip</Text>)
-      }
         <Tabs renderTabBar={()=> <ScrollableTab />}>
             {
               this.buidDuration().map(day => {
@@ -120,7 +117,6 @@ export default class Schedule extends Component {
           
           <Text style={styles.text}>Start time : 12:00</Text>
           <Text style={styles.text}>End time : 13:00</Text>
-
           <View style={{ borderBottomColor: 'black',borderBottomWidth: 1, paddingTop: '5%'}}/>
           
           <Text style={styles.location}>Harajuku</Text>
