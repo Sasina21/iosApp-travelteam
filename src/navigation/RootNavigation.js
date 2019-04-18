@@ -4,7 +4,7 @@ import { createSwitchNavigator, createStackNavigator , createBottomTabNavigator,
 import { Icon } from 'native-base'
 import Home from '../Home'
 import Schedule from '../Schedule'
-import ChatBox from '../Chat'
+import GPS from '../GPS'
 import SignOut from '../SignOut'
 import TripTable from '../TripTable'
 import SignIn from '../SignIn'
@@ -27,7 +27,7 @@ const instructions = Platform.select({
 //     // headerTitle: "My Trips"
 //   },
 //   Schedule: {screen: Schedule},
-//   ChatBox: {screen: ChatBox},
+//   GPS: {screen: GPS},
 //   SignOut: {screen: SignOut}
 // },{tabBarOptions:{
 //   showLabel: false,

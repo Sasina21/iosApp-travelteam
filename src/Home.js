@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Platform, ScrollView, View} from 'react-native';
+import {Platform, ScrollView, View, RefreshControl } from 'react-native';
 import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
 import firebase from 'react-native-firebase'
+import { FlatList } from 'react-native-gesture-handler';
 
 // import HeaderBar from './HeaderBar'
 // import FooterBar from './FooterBar'
@@ -21,11 +22,17 @@ export default class Home extends Component {
       dataTrip: null,
       oldDataTrip: null,
       checkGuide: false,
+      refreshing: false,
     };
     this.areyouGuide()
     this.componentWillMount = this.componentWillMount.bind(this)
-    this.insertUser()
     this.readOldData()
+  }
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    fetchData().then(() => {
+      this.setState({refreshing: false});
+    });
   }
 
   static navigationOptions = {
@@ -55,7 +62,7 @@ export default class Home extends Component {
         dbUser.keepSynced(true)
               await dbUser.once("value")
                 .then(snapshot => {
-                  console.log(snapshot.val())
+                  // console.log(snapshot.val())
                   if(snapshot.val() !== null){
                     console.log(snapshot.val().idGroup)
                     var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
@@ -100,28 +107,28 @@ export default class Home extends Component {
     }
 }
 
-areyouGuide(){
+async areyouGuide(){
+  console.log(firebase.auth().currentUser.uid)
   if(firebase.auth().currentUser != null){
-
     let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
-    dbGuide.keepSynced(true)
+    // dbGuide.keepSynced(true)
     dbGuide.once("value")
       .then(snapshot => {
-        if(snapshot.val() !== null){
+        // console.log(snapshot.val())
+        if(snapshot.val().Id_company !== null){
           this.setState({
             checkGuide: true,
           })
+          console.log('guide' + this.state.checkGuide)
         }
+        this.insertUser()
       })
-      console.log(this.state.checkGuide)
   }
 }
 
-async insertUser(){
+insertUser(){
   // console.log('hi')
-  if(firebase.auth().currentUser != null){
-
-    if(!this.state.checkGuide){
+  if(firebase.auth().currentUser != null && !this.state.checkGuide){
       console.log('Im user')
       let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
       dbUser.keepSynced(true)
@@ -133,7 +140,6 @@ async insertUser(){
       dbUser.child('/activeTrip').update({
         id: 'id'
       })
-    }
   }
 }
   
@@ -142,8 +148,8 @@ async insertUser(){
     const {navigate} = this.props.navigation;
     // console.log(firebase.auth().currentUser.uid)
     return (
-      <Container>
-        <ScrollView style={{ flex: 1 }}>
+      // <Container>
+        <ScrollView style={{ flex: 1 }} refreshControl={ <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._onRefresh}/> }>
           { 
               this.state.dataTrip && 
               (<Card>
@@ -167,7 +173,7 @@ async insertUser(){
 
           <View style={{marginTop:'7%' ,flex: 1}}>
           {
-            this.state.dataTrip && <Text style={{fontSize:13}}>Old Trips</Text>
+            this.state.oldDataTrip && <Text style={{fontSize:13}}>Old Trips</Text>
           }
           {
             this.state.oldDataTrip && this.state.oldDataTrip.map((item, index) => {
@@ -193,7 +199,7 @@ async insertUser(){
           }
           </View> 
         </ScrollView>
-      </Container>
+      // </Container>
     );
   }
 }

@@ -84,6 +84,9 @@ export default class Schedule extends Component {
     return(
       <Container>
       <Content contentContainerStyle={{ flex: 1 }}>
+        {
+          this.state.dataTrip == '' && <Text style={{fontSize:18, alignSelf: 'center', marginTop:'7%'}}>No active trip</Text>
+        }
         <Tabs renderTabBar={()=> <ScrollableTab />}>
             {
               this.buidDuration().map(day => {
