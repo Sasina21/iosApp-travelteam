@@ -22,14 +22,11 @@ export default class Home extends Component {
       dataTrip: null,
       oldDataTrip: null,
       checkGuide: false,
-      refreshing: false,
     };
-    this.areyouGuide()
     this.componentWillMount = this.componentWillMount.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
-    this.readOldData()
     this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
-    
+    this.insertUser = this.insertUser.bind(this)
   }
   _onRefresh = () => {
     this.setState({refreshing: true});
@@ -50,10 +47,9 @@ export default class Home extends Component {
       
     }
 
-    componentWillMount() {
+    componentWillMount(){
       this.areyouGuide()
-      this.readOldData()
-      this.readActiveData()
+      this.insertUser
     }
     componentDidMount() {
       this.readActiveData()
@@ -157,6 +153,7 @@ export default class Home extends Component {
 async areyouGuide(){
   console.log(firebase.auth().currentUser.uid)
   if(firebase.auth().currentUser != null){
+    // console.log('tesst')
     let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
     // dbGuide.keepSynced(true)
     dbGuide.once("value")
@@ -169,21 +166,19 @@ async areyouGuide(){
           console.log('guide' + this.state.checkGuide)
         }
         this.insertUser()
-        this.readActiveData()
-        this.readOldData()
       })
   }
 }
 
 insertUser(){
-  // console.log('hi')
-  if(firebase.auth().currentUser != null && this.state.checkGuide){
+  console.log('hi')
+  if((firebase.auth().currentUser != null) && this.state.checkGuide){
     console.log('Im Guide')
     let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid + '/activeTrip')
     dbGuide.update({
       id: 'id'
     })
-  }else if(firebase.auth().currentUser){
+  }else if((firebase.auth().currentUser != null) && !this.state.checkGuide){
     console.log('Im user')
       let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
       dbUser.keepSynced(true)
@@ -205,7 +200,7 @@ insertUser(){
     return (
       <Container>
         <Button transparent dark style={{alignSelf: 'flex-end'}} onPress= {this.forceUpdateHandler}><Icon name="ios-refresh" /></Button>
-        <ScrollView style={{ flex: 1 }} refreshControl={ <RefreshControl refreshing={this.state.refreshing} onRefresh={this.forceUpdateHandler}/> }>
+        <ScrollView style={{ flex: 1 }} >
           { 
               this.state.dataTrip && 
               (<Card>

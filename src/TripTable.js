@@ -29,17 +29,26 @@ export default class TabsScrollableExample extends Component {
   }
 
   readData(){
+    var arr =[]
     const { navigation } = this.props;
     const idGroup = navigation.getParam('idGroup', 'no name');
-    console.log(idGroup)
+    // console.log(idGroup)
     let dbGroup = firebase.database().ref("Groups/" + idGroup + "/Detail")
+    this.buildOptionsTime().map(time => {
       dbGroup.once("value")
         .then(snapshot => {
-          console.log(Object.values(snapshot.val()))
+          // console.log(Object.values(snapshot.val()))
+          Object.values(snapshot.val()).map(item => {
+            if(item.startTime == time){
+              // console.log(item.startTime)
+              arr.push(item)
+            }
+          })
           this.setState({
-            dataTrip: Object.values(snapshot.val())
+            dataTrip: arr
           })
         })
+    })
   }
   buidDuration(){
     const arr = []
