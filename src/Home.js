@@ -26,6 +26,7 @@ export default class Home extends Component {
     };
     this.areyouGuide()
     this.componentWillMount = this.componentWillMount.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
     this.readOldData()
     this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
     
@@ -38,6 +39,7 @@ export default class Home extends Component {
   }
 
   forceUpdateHandler(){
+    this.componentDidMount()
     this.forceUpdate();
   };
 
@@ -55,6 +57,7 @@ export default class Home extends Component {
     }
     componentDidMount() {
       this.readActiveData()
+      this.readOldData()
     }
 
     async readActiveData(){
@@ -174,8 +177,14 @@ async areyouGuide(){
 
 insertUser(){
   // console.log('hi')
-  if(firebase.auth().currentUser != null && !this.state.checkGuide){
-      console.log('Im user')
+  if(firebase.auth().currentUser != null && this.state.checkGuide){
+    console.log('Im Guide')
+    let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid + '/activeTrip')
+    dbGuide.update({
+      id: 'id'
+    })
+  }else if(firebase.auth().currentUser){
+    console.log('Im user')
       let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
       dbUser.keepSynced(true)
       dbUser.update({
