@@ -27,6 +27,7 @@ export default class GetHelp extends Component {
         <Text style={{paddingBottom: '5%'}}>{firebase.auth().currentUser.displayName}</Text>
         <Text style={{paddingBottom: '5%'}}>{firebase.auth().currentUser.email}</Text>
         <Button dark style={{alignSelf: 'center'}} onPress={this.onSignOutPress}><Text> Sign Out </Text></Button>
+        
         {/* <Button danger style={{alignSelf: 'center'}}>
             <Text>Help Me!</Text>
         </Button> */}

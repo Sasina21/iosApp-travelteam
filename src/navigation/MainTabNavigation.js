@@ -33,6 +33,10 @@ const TabNavigator = createBottomTabNavigator({
   },
 },
   navigationOptions: ({ navigation }) => {
+    tabBarOnPress: (scene, jumpToIndex) => {
+      console.log('onPress:', scene.route);
+      jumpToIndex(scene.index);
+    }
     const { routeName } = navigation.state.routes
     [navigation.state.index];
     return{

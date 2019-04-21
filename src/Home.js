@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Platform, ScrollView, View, RefreshControl } from 'react-native';
-import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon } from 'native-base';
+import { Container, Header, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left, Icon, List } from 'native-base';
 import firebase from 'react-native-firebase'
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -27,13 +27,19 @@ export default class Home extends Component {
     this.areyouGuide()
     this.componentWillMount = this.componentWillMount.bind(this)
     this.readOldData()
+    this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
+    
   }
   _onRefresh = () => {
     this.setState({refreshing: true});
-    fetchData().then(() => {
+    fetch().then(() => {
       this.setState({refreshing: false});
     });
   }
+
+  forceUpdateHandler(){
+    this.forceUpdate();
+  };
 
   static navigationOptions = {
       tabBarIcon: ({focused}) => (
@@ -43,21 +49,36 @@ export default class Home extends Component {
     }
 
     componentWillMount() {
+      this.areyouGuide()
       this.readOldData()
-      // this.readActiveData()
+      this.readActiveData()
     }
     componentDidMount() {
       this.readActiveData()
     }
-  
-    onSignOutPress = () => {
-      firebase.auth().signOut()
-    }
 
     async readActiveData(){
       var arr = []
-      if(firebase.auth().currentUser != null){
-
+      if(firebase.auth().currentUser != null && this.state.checkGuide){
+        var dbGuide= await firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/activeTrip')
+        dbGuide.keepSynced(true)
+              await dbGuide.once("value")
+                .then(snapshot => {
+                  // console.log(snapshot.val())
+                  if(snapshot.val() !== null){
+                    console.log(snapshot.val().idGroup)
+                    var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                    dbGroup.keepSynced(true)
+                      dbGroup.once("value")
+                        .then(snapshot => {
+                        this.setState({
+                          dataTrip: snapshot.val()
+                        })
+                        console.log(this.state.dataTrip)
+                        })
+                  }
+                })
+      }else if(firebase.auth().currentUser != null){
         var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
         dbUser.keepSynced(true)
               await dbUser.once("value")
@@ -81,7 +102,30 @@ export default class Home extends Component {
 
   async readOldData(){
     var arr = []
-    if(firebase.auth().currentUser != null){
+    if(firebase.auth().currentUser != null && this.state.checkGuide){
+
+      var dbGuide= firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/oldTrip')
+      dbGuide.keepSynced(true)
+      dbGuide.once("value")
+                .then(snapshot => {
+                  if(snapshot.val() !== null){
+                    console.log(Object.values(snapshot.val()))
+                    Object.values(snapshot.val()).map((item,index) => {
+                      console.log(item.idGroup)
+                      var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+                      dbGroup.keepSynced(true)
+                        dbGroup.once("value")
+                          .then(snapshot => {
+                            arr.push(snapshot.val())
+                          })
+                    })
+                    this.setState({
+                      oldDataTrip: arr
+                    })
+                    console.log(this.state.oldDataTrip)
+                  }
+                })
+    }else if(firebase.auth().currentUser != null){
 
       var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
       dbUser.keepSynced(true)
@@ -122,6 +166,8 @@ async areyouGuide(){
           console.log('guide' + this.state.checkGuide)
         }
         this.insertUser()
+        this.readActiveData()
+        this.readOldData()
       })
   }
 }
@@ -149,7 +195,7 @@ insertUser(){
     // console.log(firebase.auth().currentUser.uid)
     return (
       // <Container>
-        <ScrollView style={{ flex: 1 }} refreshControl={ <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._onRefresh}/> }>
+        <ScrollView style={{ flex: 1 }} refreshControl={ <RefreshControl refreshing={this.state.refreshing} onRefresh={this.forceUpdateHandler}/> }>
           { 
               this.state.dataTrip && 
               (<Card>
@@ -197,6 +243,8 @@ insertUser(){
               )
             })
           }
+
+          <Button onPress= {this.forceUpdateHandler}><Text>FORCE UPDATE</Text></Button>
           </View> 
         </ScrollView>
       // </Container>
