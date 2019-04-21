@@ -44,8 +44,8 @@ export default class Home extends Component {
   };
 
   static navigationOptions = {
-      tabBarIcon: ({focused}) => (
-       <Icon name="home" color={focused ? 'white' : 'black'} />
+      tabBarIcon: (
+       <Icon name="home" />
       ),
       
     }
@@ -203,7 +203,8 @@ insertUser(){
     const {navigate} = this.props.navigation;
     // console.log(firebase.auth().currentUser.uid)
     return (
-      // <Container>
+      <Container>
+        <Button transparent dark style={{alignSelf: 'flex-end'}} onPress= {this.forceUpdateHandler}><Icon name="ios-refresh" /></Button>
         <ScrollView style={{ flex: 1 }} refreshControl={ <RefreshControl refreshing={this.state.refreshing} onRefresh={this.forceUpdateHandler}/> }>
           { 
               this.state.dataTrip && 
@@ -252,11 +253,9 @@ insertUser(){
               )
             })
           }
-
-          <Button onPress= {this.forceUpdateHandler}><Text>FORCE UPDATE</Text></Button>
           </View> 
         </ScrollView>
-      // </Container>
+      </Container>
     );
   }
 }

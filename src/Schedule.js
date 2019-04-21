@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, View, TouchableHighlight, Image, ScrollView} from 'react-native';
-import { Container, Text, Content, Icon, Tabs, Tab, ScrollableTab} from 'native-base';
+import {Linking, StyleSheet, View, TouchableHighlight, Image, ScrollView} from 'react-native';
+import { Container, Text, Content, Icon, Form, Item, Label, Input, Button} from 'native-base';
 import firebase from 'react-native-firebase'
 
 
@@ -8,122 +8,94 @@ export default class Schedule extends Component {
   
   static navigationOptions = {
     tabBarIcon: ({focused}) => (
-      <Icon name="alarm"  color={focused ? 'white' : 'black'}/>
+      <Icon type="FontAwesome5" name="line"  color={focused ? 'white' : 'black'}/>
     )
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      dataTrip: [],
-      idGroup: '',
-      duration: '',
+      checkGuide: false,
+      lineURL: '',
+      linegroupURL: '',
+      activeGroup: '',
+
     };
-    this.buidDuration = this.buidDuration.bind(this)
-    this.buildOptionsTime = this.buildOptionsTime.bind(this)
-    this.readData = this.readData.bind(this)
-    this.componentWillMount = this.componentWillMount.bind(this)
+    this.areyouGuide = this.areyouGuide.bind(this)
+    
   }
 
   componentWillMount(){
-    this.readData()
-    this.buidDuration()
-    // this.buildOptionsTime()
+    this.areyouGuide()
   }
-
-  readData(){
-    let useruid = firebase.auth().currentUser.uid
-    let dbUser = firebase.database().ref("Users/" + useruid + '/activeTrip/idGroup')
-    dbUser.keepSynced(true)
-    dbUser.once("value")
-      .then(snapshot => {
-        this.setState({
-          idGroup: snapshot.val()
+  async areyouGuide(){
+    console.log(firebase.auth().currentUser.uid)
+    if(firebase.auth().currentUser != null){
+      let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
+      // dbGuide.keepSynced(true)
+      dbGuide.once("value")
+        .then(snapshot => {
+          // console.log(snapshot.val())
+          if(snapshot.val().Id_company !== null){
+            this.setState({
+              checkGuide: true,
+            })
+            console.log('guide' + this.state.checkGuide)
+          }          
         })
-        console.log(this.state.idGroup)
-        let dbGroup = firebase.database().ref("Groups/" + this.state.idGroup)
-        dbGroup.keepSynced(true)
-        dbGroup.once("value")
-          .then(snapshot => {
-            this.setState({
-              duration: snapshot.val().duration
-            })
-            console.log(snapshot.val().duration)
-          })
-        dbGroup.child('/Detail').once("value")
-          .then(snapshot => {
-            this.setState({
-              dataTrip: Object.values(snapshot.val())
-            })
-            console.log(this.state.dataTrip)
-          })
-      })
-  }
-  buidDuration(){
-    const arr = []
-    const { navigation } = this.props;
-    const duration = navigation.getParam('duration', '1');
-    for(let i = 1 ; i <= this.state.duration ; i++){
-      arr.push(i)
     }
-    console.log(arr)
-    return arr
   }
 
-  buildOptionsTime() {
-    const arr = [];
-    for (let i = 6; i <= 23 ; i++) {
-        arr.push(i+':00 ')
-        arr.push(i+':30 ')
+  async saveURL(){
+    if(firebase.auth().currentUser != null && this.state.checkGuide){
+      var dbGuide= await firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/activeTrip')
+            await dbGuide.once("value")
+              .then(snapshot => {
+                // console.log(snapshot.val())
+                if(snapshot.val() !== null){
+                  console.log(snapshot.val().idGroup)
+                  var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                  dbGroup.update({
+                    lineURL: this.state.lineURL
+                  })
+                }
+              })
+    }else if(firebase.auth().currentUser != null){
+      var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
+      // dbUser.keepSynced(true)
+            await dbUser.once("value")
+              .then(snapshot => {
+                // console.log(snapshot.val())
+                if(snapshot.val() !== null){
+                  console.log(snapshot.val().idGroup)
+                  var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                  dbGroup.update({
+                    lineURL: this.state.lineURL
+                  })
+                }
+              })
     }
-    arr.push('0:00')
-    // console.log(arr)
-    return arr
 }
+
+  
   render(){
+    const {navigate} = this.props.navigation;
     return(
       <Container>
-      <Content contentContainerStyle={{ flex: 1 }}>
-        {
-          this.state.dataTrip == '' && <Text style={{fontSize:18, alignSelf: 'center', marginTop:'7%'}}>No active trip</Text>
-        }
-        <Tabs renderTabBar={()=> <ScrollableTab />}>
-            {
-              this.buidDuration().map(day => {
-                return(
-                  <Tab key={day} heading = {'Day '+ day } >
-                  <ScrollView style={{ flex: 1 }}>
-                  {
-                    this.state.dataTrip && this.state.dataTrip.map((item, index) => {
-                      if(day == item.bookDay){
-                        console.log(item.bookDay, day)
-                        return (
-                          
-                          <View key={index} style={{margin: '4%'}}>
-                            <Text style={{fontSize: 21}}>{item.location}</Text>
-                            <Text style={styles.text}>Start time : {item.startTime}</Text>
-                            <Text style={styles.text}>End time : {item.endTime}</Text>
-                            <View style={{ borderBottomColor: 'black',borderBottomWidth: 1, paddingTop: '5%'}}/>
-                          </View>
-                        )
-                      }
-                    })
-                  }  
-                  </ScrollView>                
-                </Tab>
-              )
-            })
-          }
-        </Tabs>
-      </Content>
-    </Container>
+        <Content Content contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
+          <Form>
+            <Item floatingLabel>
+              <Label>Line Group</Label>
+              <Input onChangeText={(text) =>{this.setState({ lineURL : text })}} autoCorrect={false} autoCapitalize='none' />
+            </Item>
+            <Button style={{marginTop: '3%', alignSelf: 'center'}} onPress={this.saveURL} dark><Text> OK </Text></Button>
+          </Form>
+          <Button style={{alignSelf: 'center'}} transparent onPress={() => Linking.openURL(this.state.lineURL)}>
+            <Text>{this.state.lineURL}</Text>
+          </Button>
+        </Content>
+      </Container>
     );
   }
 }
-const styles = StyleSheet.create({
-  text:{
-    color: "black",
-    fontSize: 18,
-    marginTop: 9,
-  }
-});
+
