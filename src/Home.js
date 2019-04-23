@@ -50,11 +50,10 @@ export default class Home extends Component {
     }
 
     areyouGuide(){
-      console.log(firebase.auth().currentUser.uid)
       if(firebase.auth().currentUser != null){
         console.log('tesst')
         let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
-        // dbGuide.keepSynced(true)
+        dbGuide.keepSynced(true)
         dbGuide.once("value")
           .then(snapshot => {
             console.log(snapshot.val())
@@ -94,7 +93,7 @@ export default class Home extends Component {
       var arr = []
       if(firebase.auth().currentUser != null && this.state.checkGuide){
         var dbGuide = firebase.database().ref("Guides/" + firebase.auth().currentUser.uid)
-        // dbGuide.keepSynced(true)
+        dbGuide.keepSynced(true)
           dbGuide.child('/activeTrip').once("value")
             .then(snapshot => {
               // console.log(snapshot.val())
@@ -113,7 +112,7 @@ export default class Home extends Component {
             })
       }else if(firebase.auth().currentUser != null){
         var dbUser = firebase.database().ref("Users/" + firebase.auth().currentUser.uid)
-        // dbUser.keepSynced(true)
+        dbUser.keepSynced(true)
           dbUser.child('/activeTrip').once("value")
             .then(snapshot => {
               // console.log(snapshot.val())
@@ -137,7 +136,7 @@ export default class Home extends Component {
     var arr = []
     if(firebase.auth().currentUser != null && this.state.checkGuide){
       var dbGuide= firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/oldTrip')
-      // dbGuide.keepSynced(true)
+      dbGuide.keepSynced(true)
       dbGuide.once("value")
       .then(snapshot => {
         if(snapshot.val() !== null){
@@ -159,7 +158,7 @@ export default class Home extends Component {
       })
     }else if(firebase.auth().currentUser != null){
       var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
-      // dbUser.keepSynced(true)
+      dbUser.keepSynced(true)
         dbUser.once("value")
         .then(snapshot => {
           if(snapshot.val() !== null){
