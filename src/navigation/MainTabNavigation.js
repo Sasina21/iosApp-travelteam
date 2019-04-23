@@ -23,7 +23,7 @@ const TabNavigator = createBottomTabNavigator({
     screen: Home,
     // headerTitle: "My Trips"
   },
-  Schedule: {screen: Schedule},
+  LineGroup: {screen: Schedule},
   GPS: {screen: GPS},
   SignOut: {screen: SignOut}
 },{tabBarOptions:{

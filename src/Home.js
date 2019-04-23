@@ -21,18 +21,12 @@ export default class Home extends Component {
     this.state = {
       dataTrip: null,
       oldDataTrip: null,
-      checkGuide: false,
+      idOldTrip: null,
+      checkGuide: null,
     };
     this.componentWillMount = this.componentWillMount.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
     this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
-    this.insertUser = this.insertUser.bind(this)
-  }
-  _onRefresh = () => {
-    this.setState({refreshing: true});
-    fetch().then(() => {
-      this.setState({refreshing: false});
-    });
   }
 
   forceUpdateHandler(){
@@ -47,156 +41,151 @@ export default class Home extends Component {
       
     }
 
-    componentWillMount(){
-      this.areyouGuide()
-      this.insertUser
-    }
     componentDidMount() {
-      this.readActiveData()
       this.readOldData()
+      this.readActiveData()
+    }
+    componentWillMount() {
+      this.areyouGuide()
+    }
+
+    areyouGuide(){
+      console.log(firebase.auth().currentUser.uid)
+      if(firebase.auth().currentUser != null){
+        console.log('tesst')
+        let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
+        // dbGuide.keepSynced(true)
+        dbGuide.once("value")
+          .then(snapshot => {
+            console.log(snapshot.val())
+            if(snapshot.val()!== null){
+              console.log('Im Guide')
+              let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid + '/activeTrip')
+              dbGuide.update({
+                id: 'id'
+              })
+              this.setState({
+                checkGuide: true
+              })
+              this.readActiveData()
+              this.readOldData()
+            }else{
+              console.log('Im user')
+              let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
+              dbUser.keepSynced(true)
+              dbUser.update({
+                useruid: firebase.auth().currentUser.uid,
+                email: firebase.auth().currentUser.email,
+              })
+              dbUser.child('/activeTrip').update({
+                id: 'id'
+              })
+              this.setState({
+                checkGuide: false
+              })
+              this.readActiveData()
+              this.readOldData()
+            }
+          })
+      }
     }
 
     async readActiveData(){
       var arr = []
       if(firebase.auth().currentUser != null && this.state.checkGuide){
-        var dbGuide= await firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/activeTrip')
-        dbGuide.keepSynced(true)
-              await dbGuide.once("value")
-                .then(snapshot => {
-                  // console.log(snapshot.val())
-                  if(snapshot.val() !== null){
-                    console.log(snapshot.val().idGroup)
-                    var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
-                    dbGroup.keepSynced(true)
-                      dbGroup.once("value")
-                        .then(snapshot => {
-                        this.setState({
-                          dataTrip: snapshot.val()
-                        })
-                        console.log(this.state.dataTrip)
-                        })
-                  }
-                })
+        var dbGuide = firebase.database().ref("Guides/" + firebase.auth().currentUser.uid)
+        // dbGuide.keepSynced(true)
+          dbGuide.child('/activeTrip').once("value")
+            .then(snapshot => {
+              // console.log(snapshot.val())
+              if(snapshot.val() !== null){
+                console.log(snapshot.val().idGroup)
+                var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                dbGroup.keepSynced(true)
+                  dbGroup.once("value")
+                    .then(snapshot => {
+                    this.setState({
+                      dataTrip: snapshot.val()
+                    })
+                    console.log(this.state.dataTrip)
+                    })
+              }
+            })
       }else if(firebase.auth().currentUser != null){
-        var dbUser= await firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/activeTrip')
-        dbUser.keepSynced(true)
-              await dbUser.once("value")
-                .then(snapshot => {
-                  // console.log(snapshot.val())
-                  if(snapshot.val() !== null){
-                    console.log(snapshot.val().idGroup)
-                    var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
-                    dbGroup.keepSynced(true)
-                      dbGroup.once("value")
-                        .then(snapshot => {
-                        this.setState({
-                          dataTrip: snapshot.val()
-                        })
-                        console.log(this.state.dataTrip)
-                        })
-                  }
-                })
+        var dbUser = firebase.database().ref("Users/" + firebase.auth().currentUser.uid)
+        // dbUser.keepSynced(true)
+          dbUser.child('/activeTrip').once("value")
+            .then(snapshot => {
+              // console.log(snapshot.val())
+              if(snapshot.val() !== null){
+                console.log(snapshot.val().idGroup)
+                var dbGroup = firebase.database().ref("Groups/" + snapshot.val().idGroup )
+                dbGroup.keepSynced(true)
+                  dbGroup.once("value")
+                    .then(snapshot => {
+                    this.setState({
+                      dataTrip: snapshot.val()
+                    })
+                    console.log(this.state.dataTrip)
+                    })
+              }
+            })
       }
   }
 
   async readOldData(){
     var arr = []
     if(firebase.auth().currentUser != null && this.state.checkGuide){
-
       var dbGuide= firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/oldTrip')
-      dbGuide.keepSynced(true)
+      // dbGuide.keepSynced(true)
       dbGuide.once("value")
-                .then(snapshot => {
-                  if(snapshot.val() !== null){
-                    console.log(Object.values(snapshot.val()))
-                    Object.values(snapshot.val()).map((item,index) => {
-                      console.log(item.idGroup)
-                      var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
-                      dbGroup.keepSynced(true)
-                        dbGroup.once("value")
-                          .then(snapshot => {
-                            arr.push(snapshot.val())
-                          })
-                    })
-                    this.setState({
-                      oldDataTrip: arr
-                    })
-                    console.log(this.state.oldDataTrip)
-                  }
-                })
-    }else if(firebase.auth().currentUser != null){
-
-      var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
-      dbUser.keepSynced(true)
-        dbUser.once("value")
-                .then(snapshot => {
-                  if(snapshot.val() !== null){
-                    console.log(Object.values(snapshot.val()))
-                    Object.values(snapshot.val()).map((item,index) => {
-                      console.log(item.idGroup)
-                      var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
-                      dbGroup.keepSynced(true)
-                        dbGroup.once("value")
-                          .then(snapshot => {
-                            arr.push(snapshot.val())
-                          })
-                    })
-                    this.setState({
-                      oldDataTrip: arr
-                    })
-                    console.log(this.state.oldDataTrip)
-                  }
-                })
-    }
-}
-
-async areyouGuide(){
-  console.log(firebase.auth().currentUser.uid)
-  if(firebase.auth().currentUser != null){
-    // console.log('tesst')
-    let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid)
-    // dbGuide.keepSynced(true)
-    dbGuide.once("value")
       .then(snapshot => {
-        // console.log(snapshot.val())
-        if(snapshot.val().Id_company !== null){
-          this.setState({
-            checkGuide: true,
+        if(snapshot.val() !== null){
+          console.log(Object.values(snapshot.val()))
+          Object.values(snapshot.val()).map((item,index) => {
+            console.log(item.idGroup)
+            var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+            dbGroup.keepSynced(true)
+              dbGroup.once("value")
+                .then(snapshot => {
+                  arr.push(snapshot.val())
+                })
           })
-          console.log('guide' + this.state.checkGuide)
+          this.setState({
+            oldDataTrip: arr
+          })
+          console.log(this.state.oldDataTrip)
         }
-        this.insertUser()
       })
+    }else if(firebase.auth().currentUser != null){
+      var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
+      // dbUser.keepSynced(true)
+        dbUser.once("value")
+        .then(snapshot => {
+          if(snapshot.val() !== null){
+            console.log(Object.values(snapshot.val()))
+            Object.values(snapshot.val()).map((item,index) => {
+              console.log(item.idGroup)
+              var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+              dbGroup.keepSynced(true)
+                dbGroup.once("value")
+                  .then(snapshot => {
+                    arr.push(snapshot.val())
+                  })
+            })
+            this.setState({
+              oldDataTrip: arr
+            })
+            console.log(this.state.oldDataTrip)
+          }
+        })
+    }
   }
-}
 
-insertUser(){
-  console.log('hi')
-  if((firebase.auth().currentUser != null) && this.state.checkGuide){
-    console.log('Im Guide')
-    let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid + '/activeTrip')
-    dbGuide.update({
-      id: 'id'
-    })
-  }else if((firebase.auth().currentUser != null) && !this.state.checkGuide){
-    console.log('Im user')
-      let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
-      dbUser.keepSynced(true)
-      dbUser.update({
-        useruid: firebase.auth().currentUser.uid,
-        email: firebase.auth().currentUser.email,
-      })
-    
-      dbUser.child('/activeTrip').update({
-        id: 'id'
-      })
-  }
-}
   
 
   render() {
     const {navigate} = this.props.navigation;
-    // console.log(firebase.auth().currentUser.uid)
     return (
       <Container>
         <Button transparent dark style={{alignSelf: 'flex-end'}} onPress= {this.forceUpdateHandler}><Icon name="ios-refresh" /></Button>

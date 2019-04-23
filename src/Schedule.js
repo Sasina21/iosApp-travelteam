@@ -17,7 +17,7 @@ export default class Schedule extends Component {
     this.state = {
       checkGuide: false,
       lineURL: '',
-      readLineURL: '',
+      readLineURL: null,
       activeGroup: '',
 
     };
@@ -134,12 +134,18 @@ export default class Schedule extends Component {
         </Form>
 
         }
-         
-
-          <Button style={{alignSelf: 'center'}} transparent onPress={() => Linking.openURL(this.state.readLineURL)}>
-            <Text>{this.state.readLineURL}</Text>
-          </Button>
+        <Button style={{alignSelf: 'center'}} transparent onPress={() => Linking.openURL(this.state.readLineURL)}>
+          <Text>{this.state.readLineURL}</Text>
+        </Button>
+        {
+          this.state.readLineURL &&
           <Text style={{alignSelf: 'center', marginTop: '5%'}}>Click link to join line group.</Text>
+        }
+        {
+          !this.state.readLineURL &&
+          <Text style={{alignSelf: 'center', marginTop: '5%'}}>No line group.</Text>
+        }
+        
         </Content>
       </Container>
     );

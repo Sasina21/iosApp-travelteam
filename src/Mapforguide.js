@@ -33,16 +33,13 @@ export default class Map extends Component {
     this.componentDidMount = this.componentDidMount.bind(this)
   }
 
-  componentWillMount(){
-    this.readGPS()
-  }
-
   forceUpdateHandler(){
-    this.readGPS()
+    this.componentDidMount()
     this.forceUpdate()
   };
 
   readGPS(){
+    console.log('hi')
     if(firebase.auth().currentUser != null){
       var dbGuide = firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/activeTrip/idGroup')
       dbGuide.keepSynced(true)
@@ -54,11 +51,17 @@ export default class Map extends Component {
                   var dbGroup = firebase.database().ref("Groups/" + snapshot.val() + '/gps' )
                     dbGroup.once("value")
                       .then(snapshot => {
-                      console.log(Object.values(snapshot.val()))
-                      this.setState({
-                        dataGPS: Object.values(snapshot.val())
-                      })
-                      console.log(this.state.dataGPS)
+                        if(snapshot.val() != null){
+                          console.log(Object.values(snapshot.val()))
+                          this.setState({
+                            dataGPS: Object.values(snapshot.val())
+                          })
+                          console.log(this.state.dataGPS)
+                        }else{
+                          this.setState({
+                            dataGPS: null
+                          })
+                        }
                       })
                 }
               })
@@ -66,6 +69,7 @@ export default class Map extends Component {
   }
   
   componentDidMount(){
+    this.readGPS()
     navigator.geolocation.getCurrentPosition(position => {
         this.setState({
           latitude: position.coords.latitude,

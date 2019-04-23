@@ -105,7 +105,7 @@ export default class GetHelp extends Component {
         {
           this.state.checkGuide &&
           <Form style={{marginBottom: '10%'}}>
-          <Button onPress={() => Alert.alert('Terminate', 'Are you sure to terminate this trip ?', [{text: 'Ok', onPress: () => {this.terminateTrip}},{text: 'Cancel'}])} danger style={{alignSelf: 'center'}}>
+          <Button onPress={() => Alert.alert('Terminate', 'Are you sure to terminate this trip ?', [{text: 'Ok', onPress: () => this.terminateTrip()},{text: 'Cancel'}])} danger style={{alignSelf: 'center'}}>
             <Text>Terminate</Text>
           </Button>
           <Text style={{alignSelf: 'center', marginTop: '5%'}}>Click the button to terminate this trip.</Text>
