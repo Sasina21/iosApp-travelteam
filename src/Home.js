@@ -21,16 +21,15 @@ export default class Home extends Component {
     this.state = {
       dataTrip: null,
       oldDataTrip: null,
-      idOldTrip: null,
+      idOldTrip:null,
+      checkOldTrip: false,
       checkGuide: null,
     };
-    this.componentWillMount = this.componentWillMount.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
     this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
   }
 
   forceUpdateHandler(){
-    this.componentDidMount()
     this.forceUpdate();
   };
 
@@ -42,12 +41,9 @@ export default class Home extends Component {
     }
 
     componentDidMount() {
-      this.readOldData()
-      this.readActiveData()
-    }
-    componentWillMount() {
       this.areyouGuide()
     }
+   
 
     areyouGuide(){
       if(firebase.auth().currentUser != null){
@@ -59,15 +55,13 @@ export default class Home extends Component {
             console.log(snapshot.val())
             if(snapshot.val()!== null){
               console.log('Im Guide')
-              let dbGuide = firebase.database().ref('Guides/' + firebase.auth().currentUser.uid + '/activeTrip')
-              dbGuide.update({
+              dbGuide.child('/activeTrip').update({
                 id: 'id'
               })
               this.setState({
                 checkGuide: true
               })
-              this.readActiveData()
-              this.readOldData()
+              // this.readActiveData()
             }else{
               console.log('Im user')
               let dbUser = firebase.database().ref('Users/' + firebase.auth().currentUser.uid)
@@ -82,8 +76,7 @@ export default class Home extends Component {
               this.setState({
                 checkGuide: false
               })
-              this.readActiveData()
-              this.readOldData()
+              // this.readActiveData()
             }
           })
       }
@@ -110,6 +103,15 @@ export default class Home extends Component {
                     })
               }
             })
+        dbGuide.child('/oldTrip').once("value")
+        .then(snapshot => {
+          if(snapshot.val() !== null){
+            this.setState({
+              idOldTrip: Object.values(snapshot.val())
+            })
+            console.log(this.state.idOldTrip)
+          }
+        })
       }else if(firebase.auth().currentUser != null){
         var dbUser = firebase.database().ref("Users/" + firebase.auth().currentUser.uid)
         dbUser.keepSynced(true)
@@ -129,61 +131,45 @@ export default class Home extends Component {
                     })
               }
             })
+        dbUser.child('/oldTrip').once("value")
+        .then(snapshot => {
+          if(snapshot.val() !== null){
+            this.setState({
+              idOldTrip: Object.values(snapshot.val()),
+            })
+            console.log(this.state.idOldTrip)
+          }
+        })
       }
   }
 
-  async readOldData(){
+  readOldData(){
     var arr = []
-    if(firebase.auth().currentUser != null && this.state.checkGuide){
-      var dbGuide= firebase.database().ref("Guides/" + firebase.auth().currentUser.uid + '/oldTrip')
-      dbGuide.keepSynced(true)
-      dbGuide.once("value")
-      .then(snapshot => {
-        if(snapshot.val() !== null){
-          console.log(Object.values(snapshot.val()))
-          Object.values(snapshot.val()).map((item,index) => {
-            console.log(item.idGroup)
-            var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
-            dbGroup.keepSynced(true)
-              dbGroup.once("value")
-                .then(snapshot => {
-                  arr.push(snapshot.val())
-                })
+    this.state.idOldTrip.map((item,index) => {
+      console.log(item.idGroup)
+      var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
+      dbGroup.keepSynced(true)
+        dbGroup.once("value")
+          .then(snapshot => {
+            arr.push(snapshot.val())
           })
-          this.setState({
-            oldDataTrip: arr
-          })
-          console.log(this.state.oldDataTrip)
-        }
-      })
-    }else if(firebase.auth().currentUser != null){
-      var dbUser= firebase.database().ref("Users/" + firebase.auth().currentUser.uid + '/oldTrip')
-      dbUser.keepSynced(true)
-        dbUser.once("value")
-        .then(snapshot => {
-          if(snapshot.val() !== null){
-            console.log(Object.values(snapshot.val()))
-            Object.values(snapshot.val()).map((item,index) => {
-              console.log(item.idGroup)
-              var dbGroup = firebase.database().ref("Groups/" + item.idGroup )
-              dbGroup.keepSynced(true)
-                dbGroup.once("value")
-                  .then(snapshot => {
-                    arr.push(snapshot.val())
-                  })
-            })
-            this.setState({
-              oldDataTrip: arr
-            })
-            console.log(this.state.oldDataTrip)
-          }
-        })
-    }
+    })
+    this.setState({
+      oldDataTrip: arr,
+      checkOldTrip: true,
+    })
+    console.log(this.state.oldDataTrip)
   }
 
   
 
   render() {
+    if(this.state.checkGuide != null && !this.state.checkOldTrip){
+      this.readActiveData()
+    }
+    if(this.state.idOldTrip != null && !this.state.checkOldTrip){
+      this.readOldData()
+    }
     const {navigate} = this.props.navigation;
     return (
       <Container>
